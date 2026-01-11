@@ -39,7 +39,7 @@ function App() {
 
   const handleToggleTodo = async (id) => {
     try {
-      await graphQLClient.request(queries.toggleTodo, { id: id.toString() });
+      await graphQLClient.request(queries.toggleTodo, { id: parseInt(id) });
       await fetchTodos();
     } catch (err) {
       setError('Failed to toggle todo: ' + err.message);
@@ -49,7 +49,7 @@ function App() {
 
   const handleDeleteTodo = async (id) => {
     try {
-      await graphQLClient.request(queries.deleteTodo, { id: id.toString() });
+      await graphQLClient.request(queries.deleteTodo, { id: parseInt(id) });
       await fetchTodos();
     } catch (err) {
       setError('Failed to delete todo: ' + err.message);
@@ -60,7 +60,7 @@ function App() {
   const handleUpdateTodo = async (id, title, description) => {
     try {
       await graphQLClient.request(queries.updateTodo, { 
-        id: id.toString(), 
+        id: parseInt(id), 
         title, 
         description 
       });
