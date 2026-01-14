@@ -28,9 +28,80 @@ RUN quarkus create app todo-app \
 
 WORKDIR "/home/$USER/todo-app"
 
-COPY Todo.java ./src/main/java/org/acme/Todo.java
-COPY TodoResource.java ./src/main/java/org/acme/TodoResource.java
-COPY application.properties ./src/main/resources/application.properties
+COPY --chown=$USER:$USER <<EOF src/main/java/org/acme/Todo.java
+package org.acme;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.Entity;
+
+@Entity
+public class Todo extends PanacheEntity {
+    public String title;
+    public String description;
+    public boolean completed;
+}
+EOF
+
+COPY --chown=$USER:$USER <<EOF src/main/java/org/acme/TodoResource.java
+package org.acme;
+
+import org.eclipse.microprofile.graphql.GraphQLApi;
+import org.eclipse.microprofile.graphql.Mutation;
+import org.eclipse.microprofile.graphql.Query;
+import jakarta.transaction.Transactional;
+import java.util.List;
+
+@GraphQLApi
+public class TodoResource {
+
+    @Query("allTodos")
+    public List<Todo> getAllTodos() {
+        return Todo.listAll();
+    }
+
+    @Query("todo")
+    public Todo getTodo(Long id) {
+        return Todo.findById(id);
+    }
+
+    @Mutation("createTodo")
+    @Transactional
+    public Todo createTodo(String title, String description) {
+        Todo todo = new Todo();
+        todo.title = title;
+        todo.description = description;
+        todo.completed = false;
+        todo.persist();
+        return todo;
+    }
+
+    @Mutation("updateTodo")
+    @Transactional
+    public Todo updateTodo(Long id, String title, String description, Boolean completed) {
+        Todo todo = Todo.findById(id);
+        if (todo != null) {
+            if (title != null) todo.title = title;
+            if (description != null) todo.description = description;
+            if (completed != null) todo.completed = completed;
+        }
+        return todo;
+    }
+
+    @Mutation("deleteTodo")
+    @Transactional
+    public boolean deleteTodo(Long id) {
+        return Todo.deleteById(id);
+    }
+}
+EOF
+
+COPY --chown=$USER:$USER <<EOF src/main/resources/application.properties
+quarkus.datasource.db-kind=postgresql
+quarkus.datasource.username=quarkus
+quarkus.datasource.password=quarkus
+quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/todos
+quarkus.hibernate-orm.database.generation=drop-and-create
+EOF
 
 RUN ./mvnw test --fail-at-end
 
@@ -38,9 +109,6 @@ EXPOSE 8888
 
 ENV QUARKUS_HTTP_PORT="8888"
 ENV QUARKUS_HTTP_HOST="0.0.0.0"
-
-#CMD [ "quarkus", "dev" ]
-
 ENV QUARKUS_HTTP_CORS="true"
 ENV QUARKUS_HTTP_CORS_ORIGINS="*"
 
