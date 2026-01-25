@@ -3,10 +3,13 @@ FROM debian:trixie-slim as build-env
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt upgrade -y \
-    && apt install -y --no-install-recommends --no-install-suggests curl \
-    && apt install -y --no-install-recommends --no-install-suggests openjdk-21-jdk maven \
-    && rm -rf "/var/lib/apt/lists/*" \
-    && rm -rf /var/cache/apt/archives
+  # install tools
+  && apt install -y --no-install-recommends --no-install-suggests curl \
+  # install quarkus dependencies
+  && apt install -y --no-install-recommends --no-install-suggests openjdk-21-jdk maven \
+  # make image smaller
+  && rm -rf "/var/lib/apt/lists/*" \
+  && rm -rf /var/cache/apt/archives
 
 ARG USER=quarkus
 RUN useradd --create-home --shell /bin/bash $USER
@@ -21,6 +24,10 @@ RUN curl -Ls https://sh.jbang.dev/ --output jbang.bash \
     && cat jbang.bash | bash -s - app install --fresh --force quarkus@quarkusio
 
 ENV PATH="/home/$USER/.jbang/bin:${PATH}"
+
+RUN java --version
+RUN mvn --version
+RUN quarkus version
 
 RUN quarkus create app todo-app \
     --extension='smallrye-graphql,hibernate-orm-panache,jdbc-postgresql,resteasy-reactive' \
@@ -104,15 +111,23 @@ quarkus.datasource.jdbc.url=jdbc:postgresql://host.containers.internal:5432/todo
 quarkus.hibernate-orm.database.generation=drop-and-create
 EOF
 
+# Run JUnit 5 tests
 RUN ./mvnw test --fail-at-end
+
+# Package the application
+RUN ./mvnw package -DskipTests
 
 EXPOSE 8888
 
 ENV QUARKUS_HTTP_PORT="8888"
 ENV QUARKUS_HTTP_HOST="0.0.0.0"
+
+#CMD [ "quarkus", "dev" ]
+
 ENV QUARKUS_HTTP_CORS="true"
 ENV QUARKUS_HTTP_CORS_ORIGINS="*"
 
-CMD [ "./mvnw", "quarkus:run" ]
+CMD [ "java", "-jar", "target/quarkus-app/quarkus-run.jar" ]
+#CMD [ "./mvnw", "quarkus:run" ]
 
 HEALTHCHECK CMD curl -f "http://localhost:8888/graphql/schema.graphql" || exit 1
