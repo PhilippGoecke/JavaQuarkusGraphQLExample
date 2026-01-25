@@ -25,10 +25,11 @@ ENV PATH="/home/$USER/.jbang/bin:${PATH}"
 RUN quarkus create app todo-app \
     --extension='smallrye-graphql,hibernate-orm-panache,jdbc-postgresql,resteasy-reactive' \
     && cd todo-app
+# RUN quarkus extension add smallrye-graphql
 
 WORKDIR "/home/$USER/todo-app"
 
-COPY --chown=$USER:$USER <<EOF src/main/java/org/acme/Todo.java
+RUN cat > src/main/java/org/acme/Todo.java <<'EOF'
 package org.acme;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
@@ -42,7 +43,7 @@ public class Todo extends PanacheEntity {
 }
 EOF
 
-COPY --chown=$USER:$USER <<EOF src/main/java/org/acme/TodoResource.java
+RUN cat > src/main/java/org/acme/TodoResource.java <<'EOF'
 package org.acme;
 
 import org.eclipse.microprofile.graphql.GraphQLApi;
@@ -95,11 +96,11 @@ public class TodoResource {
 }
 EOF
 
-COPY --chown=$USER:$USER <<EOF src/main/resources/application.properties
+RUN cat > src/main/resources/application.properties <<'EOF'
 quarkus.datasource.db-kind=postgresql
 quarkus.datasource.username=quarkus
 quarkus.datasource.password=quarkus
-quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/todos
+quarkus.datasource.jdbc.url=jdbc:postgresql://host.containers.internal:5432/todos
 quarkus.hibernate-orm.database.generation=drop-and-create
 EOF
 
