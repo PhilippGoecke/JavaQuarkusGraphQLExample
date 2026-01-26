@@ -106,7 +106,7 @@ EOF
 RUN cat > src/main/resources/application.properties <<'EOF'
 quarkus.datasource.db-kind=postgresql
 quarkus.datasource.username=quarkus
-quarkus.datasource.password=quarkus
+quarkus.datasource.password=secret
 quarkus.datasource.jdbc.url=jdbc:postgresql://host.containers.internal:5432/todos
 quarkus.hibernate-orm.database.generation=drop-and-create
 EOF
