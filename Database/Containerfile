@@ -30,7 +30,7 @@ EXPOSE 5432
 USER postgres
 
 # Initialize database and start PostgreSQL
-CMD ["postgres", "-D", "/var/lib/postgresql/data"]
+CMD ["/usr/lib/postgresql/17/bin/postgres", "-D", "/var/lib/postgresql/data"]
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
