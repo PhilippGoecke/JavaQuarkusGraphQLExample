@@ -30,7 +30,7 @@ RUN mvn --version
 RUN quarkus version
 
 RUN quarkus create app todo-app \
-    --extension='smallrye-graphql,graphql-ui,hibernate-orm-panache,jdbc-postgresql,resteasy-reactive' \
+    --extension='smallrye-graphql,quarkus-smallrye-graphql-ui,hibernate-orm-panache,jdbc-postgresql,resteasy-reactive' \
     && cd todo-app
 # RUN quarkus extension add smallrye-graphql
 
