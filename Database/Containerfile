@@ -1,10 +1,13 @@
-FROM debian:trixie-slim
+FROM debian:trixie-slim as build-env
 
-# Install dependencies and PostgreSQL
-RUN apt-get update && apt-get install -y \
-    postgresql-16 \
-    postgresql-contrib-16 \
-    && rm -rf /var/lib/apt/lists/*
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt upgrade -y \
+  # Install PostgreSQL
+  && apt install -y --no-install-recommends --no-install-suggests postgresql-17 postgresql-contrib-17 \
+  # make image smaller
+  && rm -rf "/var/lib/apt/lists/*" \
+  && rm -rf /var/cache/apt/archives
 
 # Set environment variables
 ENV POSTGRES_USER=postgres \
