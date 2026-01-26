@@ -31,6 +31,12 @@ RUN /usr/lib/postgresql/17/bin/initdb -D /var/lib/postgresql/data && \
   echo "listen_addresses = '*'" >> /var/lib/postgresql/data/postgresql.conf && \
   echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf
 
+# Create quarkus user with password
+RUN /usr/lib/postgresql/17/bin/pg_ctl -D /var/lib/postgresql/data start && \
+  psql -c "CREATE USER quarkus WITH PASSWORD 'secret';" && \
+  psql -c "ALTER USER quarkus CREATEDB;" && \
+  /usr/lib/postgresql/17/bin/pg_ctl -D /var/lib/postgresql/data stop
+
 VOLUME ["/var/lib/postgresql/data"]
 
 # Expose PostgreSQL port
