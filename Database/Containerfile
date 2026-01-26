@@ -35,6 +35,7 @@ RUN /usr/lib/postgresql/17/bin/initdb -D /var/lib/postgresql/data && \
 RUN /usr/lib/postgresql/17/bin/pg_ctl -D /var/lib/postgresql/data start && \
   psql -c "CREATE USER quarkus WITH PASSWORD 'secret';" && \
   psql -c "ALTER USER quarkus CREATEDB;" && \
+  psql -c "CREATE DATABASE todos OWNER quarkus;" && \
   /usr/lib/postgresql/17/bin/pg_ctl -D /var/lib/postgresql/data stop
 
 VOLUME ["/var/lib/postgresql/data"]
