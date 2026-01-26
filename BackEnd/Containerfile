@@ -104,6 +104,7 @@ public class TodoResource {
 EOF
 
 RUN cat > src/main/resources/application.properties <<'EOF'
+quarkus.smallrye-graphql.ui.always-include=true
 quarkus.datasource.db-kind=postgresql
 quarkus.datasource.username=quarkus
 quarkus.datasource.password=secret
