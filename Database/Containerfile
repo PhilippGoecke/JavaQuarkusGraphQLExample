@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt upgrade -y \
   # Install PostgreSQL
-  && apt install -y --no-install-recommends --no-install-suggests postgresql postgresql-contrib postgres-client \
+  && apt install -y --no-install-recommends --no-install-suggests postgresql postgresql-contrib postgresql-client \
   # make image smaller
   && rm -rf "/var/lib/apt/lists/*" \
   && rm -rf /var/cache/apt/archives
