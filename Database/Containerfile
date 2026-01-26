@@ -1,0 +1,36 @@
+FROM debian:trixie-slim
+
+# Install dependencies and PostgreSQL
+RUN apt-get update && apt-get install -y \
+    postgresql-16 \
+    postgresql-contrib-16 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables
+ENV POSTGRES_USER=postgres \
+    POSTGRES_DB=postgres \
+    POSTGRES_PASSWORD=postgres \
+    PGDATA=/var/lib/postgresql/data
+
+# Create data directory
+RUN mkdir -p "$PGDATA" && \
+    chown -R postgres:postgres "$PGDATA" && \
+    chmod 700 "$PGDATA"
+
+# Copy custom configuration (optional)
+# COPY postgresql.conf /etc/postgresql/postgresql.conf
+
+# Expose PostgreSQL port
+EXPOSE 5432
+
+# Switch to postgres user
+USER postgres
+
+# Initialize database and start PostgreSQL
+CMD ["postgres", "-D", "/var/lib/postgresql/data"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD pg_isready -U $POSTGRES_USER || exit 1
+
+VOLUME ["/var/lib/postgresql/data"]
