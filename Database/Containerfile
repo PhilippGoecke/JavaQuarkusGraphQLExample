@@ -11,14 +11,14 @@ RUN apt update && apt upgrade -y \
 
 # Set environment variables
 ENV POSTGRES_USER=postgres \
-    POSTGRES_DB=postgres \
-    POSTGRES_PASSWORD=postgres \
-    PGDATA=/var/lib/postgresql/data
+  POSTGRES_DB=postgres \
+  POSTGRES_PASSWORD=postgres \
+  PGDATA=/var/lib/postgresql/data
 
 # Create data directory
 RUN mkdir -p "$PGDATA" && \
-    chown -R postgres:postgres "$PGDATA" && \
-    chmod 700 "$PGDATA"
+  chown -R postgres:postgres "$PGDATA" && \
+  chmod 700 "$PGDATA"
 
 # Copy custom configuration (optional)
 # COPY postgresql.conf /etc/postgresql/postgresql.conf
@@ -27,7 +27,9 @@ RUN mkdir -p "$PGDATA" && \
 USER postgres
 
 # Initialize database cluster
-RUN /usr/lib/postgresql/17/bin/initdb -D /var/lib/postgresql/data
+RUN /usr/lib/postgresql/17/bin/initdb -D /var/lib/postgresql/data && \
+  echo "listen_addresses = '*'" >> /var/lib/postgresql/data/postgresql.conf && \
+  echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf
 
 VOLUME ["/var/lib/postgresql/data"]
 
