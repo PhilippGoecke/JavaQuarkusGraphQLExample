@@ -23,17 +23,19 @@ RUN mkdir -p "$PGDATA" && \
 # Copy custom configuration (optional)
 # COPY postgresql.conf /etc/postgresql/postgresql.conf
 
-# Expose PostgreSQL port
-EXPOSE 5432
-
 # Switch to postgres user
 USER postgres
+
+# Initialize database cluster
+RUN /usr/lib/postgresql/17/bin/initdb -D /var/lib/postgresql/data
+
+VOLUME ["/var/lib/postgresql/data"]
+
+# Expose PostgreSQL port
+EXPOSE 5432
 
 # Initialize database and start PostgreSQL
 CMD ["/usr/lib/postgresql/17/bin/postgres", "-D", "/var/lib/postgresql/data"]
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD pg_isready -U $POSTGRES_USER || exit 1
-
-VOLUME ["/var/lib/postgresql/data"]
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD pg_isready -U $POSTGRES_USER || exit 1
