@@ -62,12 +62,12 @@ import java.util.List;
 @GraphQLApi
 public class TodoResource {
 
-    @Query("allTodos")
+    @Query("getAllTodos")
     public List<Todo> getAllTodos() {
         return Todo.listAll();
     }
 
-    @Query("todo")
+    @Query("getTodo")
     public Todo getTodo(Long id) {
         return Todo.findById(id);
     }
@@ -104,6 +104,7 @@ public class TodoResource {
 EOF
 
 RUN cat > src/main/resources/application.properties <<'EOF'
+quarkus.log.level=TRACE
 quarkus.smallrye-graphql.ui.always-include=true
 quarkus.smallrye-graphql.ui.root-path=graphql-ui
 quarkus.smallrye-graphql.log-payload=query-and-variables
