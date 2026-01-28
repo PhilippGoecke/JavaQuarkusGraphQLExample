@@ -105,6 +105,9 @@ EOF
 
 RUN cat > src/main/resources/application.properties <<'EOF'
 quarkus.smallrye-graphql.ui.always-include=true
+quarkus.smallrye-graphql.ui.root-path=graphql-ui
+quarkus.smallrye-graphql.log-payload=query-and-variables
+quarkus.smallrye-graphql.root-path=graphql
 quarkus.datasource.db-kind=postgresql
 quarkus.datasource.username=quarkus
 quarkus.datasource.password=secret
